@@ -11,28 +11,48 @@ permissions:
 concurrency: update
 
 jobs:
-  homie:
+  formulas:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
-      # The contents API (no checkout, no git push) makes the commit signed
-      # by GitHub as github-actions[bot].
-      - name: Write Formula/homie.rb for the latest release
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: apps.txt
+          sparse-checkout-cone-mode: false
+      # Writes go through the contents API (no git push), so GitHub signs the
+      # commits as github-actions[bot]. One app failing does not stop the rest.
+      - name: Update Formula/<repo>.rb for each app in apps.txt
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag=$(gh api repos/franzramadhan/homie/releases/latest --jq .tag_name)
-          version="${tag#v}"
-          path="repos/${GITHUB_REPOSITORY}/contents/Formula/homie.rb"
-          current=$(gh api "$path" --jq .content 2>/dev/null | base64 -d | sed -n 's/^  version "\(.*\)"$/\1/p' || true)
-          if [ "$current" = "$version" ]; then echo "homie $version is current"; exit 0; fi
-          gh release download "$tag" --repo franzramadhan/homie --pattern SHA256SUMS
-          # the generator lives in homie; releases before it existed use main's copy
-          gh api "repos/franzramadhan/homie/contents/scripts/homebrew-formula.sh?ref=${tag}" --jq .content 2>/dev/null | base64 -d > formula.sh \
-            || gh api repos/franzramadhan/homie/contents/scripts/homebrew-formula.sh --jq .content | base64 -d > formula.sh
-          bash formula.sh "$version" SHA256SUMS > homie.rb
-          sha=$(gh api "$path" --jq .sha 2>/dev/null || true)
-          args=(-f message="homie ${version}" -f content="$(base64 -w0 homie.rb)")
-          if [ -n "$sha" ]; then args+=(-f sha="$sha"); fi
-          gh api --method PUT "$path" "${args[@]}" --jq .commit.html_url
+          # shellcheck disable=SC2329 # called through bash -c below
+          update() {
+            local repo=$1 name=${1#*/} tag version path current sha work
+            tag=$(gh api "repos/${repo}/releases/latest" --jq .tag_name)
+            version="${tag#v}"
+            path="repos/${GITHUB_REPOSITORY}/contents/Formula/${name}.rb"
+            current=$(gh api "$path" --jq .content 2>/dev/null | base64 -d | sed -n 's/^  version "\(.*\)"$/\1/p' || true)
+            if [ "$current" = "$version" ]; then echo "${name} ${version} is current"; return; fi
+            work=$(mktemp -d)
+            gh release download "$tag" --repo "$repo" --pattern SHA256SUMS --dir "$work"
+            # the generator at the release tag; releases older than it use the default branch's copy
+            gh api "repos/${repo}/contents/scripts/homebrew-formula.sh?ref=${tag}" --jq .content 2>/dev/null | base64 -d > "$work/formula.sh" \
+              || gh api "repos/${repo}/contents/scripts/homebrew-formula.sh" --jq .content | base64 -d > "$work/formula.sh"
+            bash "$work/formula.sh" "$version" "$work/SHA256SUMS" > "$work/formula.rb"
+            sha=$(gh api "$path" --jq .sha 2>/dev/null || true)
+            local args=(-f message="${name} ${version}" -f content="$(base64 -w0 "$work/formula.rb")")
+            if [ -n "$sha" ]; then args+=(-f sha="$sha"); fi
+            gh api --method PUT "$path" "${args[@]}" --jq .commit.html_url
+          }
+          export -f update
+          # a fresh shell per app: set -e is ignored inside `cmd || ...`
+          failed=0
+          while read -r repo; do
+            case "$repo" in ''|'#'*) continue ;; esac
+            echo "::group::${repo}"
+            bash -eo pipefail -c 'update "$1"' _ "$repo" || { echo "::error::${repo} failed"; failed=1; }
+            echo "::endgroup::"
+          done < apps.txt
+          exit "$failed"

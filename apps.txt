@@ -1,0 +1,2 @@
+# One GitHub repository per line. Formula/<repo name>.rb tracks its latest release.
+franzramadhan/homie
