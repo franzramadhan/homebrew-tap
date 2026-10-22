@@ -1,0 +1,38 @@
+name: update
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency: update
+
+jobs:
+  homie:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      # The contents API (no checkout, no git push) makes the commit signed
+      # by GitHub as github-actions[bot].
+      - name: Write Formula/homie.rb for the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh api repos/franzramadhan/homie/releases/latest --jq .tag_name)
+          version="${tag#v}"
+          path="repos/${GITHUB_REPOSITORY}/contents/Formula/homie.rb"
+          current=$(gh api "$path" --jq .content 2>/dev/null | base64 -d | sed -n 's/^  version "\(.*\)"$/\1/p' || true)
+          if [ "$current" = "$version" ]; then echo "homie $version is current"; exit 0; fi
+          gh release download "$tag" --repo franzramadhan/homie --pattern SHA256SUMS
+          # the generator lives in homie; releases before it existed use main's copy
+          gh api "repos/franzramadhan/homie/contents/scripts/homebrew-formula.sh?ref=${tag}" --jq .content 2>/dev/null | base64 -d > formula.sh \
+            || gh api repos/franzramadhan/homie/contents/scripts/homebrew-formula.sh --jq .content | base64 -d > formula.sh
+          bash formula.sh "$version" SHA256SUMS > homie.rb
+          sha=$(gh api "$path" --jq .sha 2>/dev/null || true)
+          args=(-f message="homie ${version}" -f content="$(base64 -w0 homie.rb)")
+          if [ -n "$sha" ]; then args+=(-f sha="$sha"); fi
+          gh api --method PUT "$path" "${args[@]}" --jq .commit.html_url
