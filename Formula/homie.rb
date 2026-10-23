@@ -2,28 +2,28 @@
 class Homie < Formula
   desc "One page for the whole homelab"
   homepage "https://github.com/franzramadhan/homie"
-  version "0.6.0"
+  version "0.6.1"
   license "MIT"
 
   on_macos do
     on_arm do
-      url "https://github.com/franzramadhan/homie/releases/download/v0.6.0/homie-v0.6.0-aarch64-apple-darwin.tar.gz"
-      sha256 "41369b5d43d895b30152d89b3fbc531db57cbcad3958722e4f3696da83a9f500"
+      url "https://github.com/franzramadhan/homie/releases/download/v0.6.1/homie-v0.6.1-aarch64-apple-darwin.tar.gz"
+      sha256 "1c457dfab9d4342ae7d7662e860342d7eca9d4962b4be5059b883255f7b1a484"
     end
     on_intel do
-      url "https://github.com/franzramadhan/homie/releases/download/v0.6.0/homie-v0.6.0-x86_64-apple-darwin.tar.gz"
-      sha256 "d41b3722e6919e586c7091ee1a8d192ddff9ec3827120779a150d3b2f5ccf494"
+      url "https://github.com/franzramadhan/homie/releases/download/v0.6.1/homie-v0.6.1-x86_64-apple-darwin.tar.gz"
+      sha256 "973682ffc968740403e33cedb6fca2d5a13c6f2c39920bf013d8288d446b0dd5"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/franzramadhan/homie/releases/download/v0.6.0/homie-v0.6.0-aarch64-unknown-linux-musl.tar.gz"
-      sha256 "f304439a1061aeb673d11c8a97523617e4c959ee7c41481325f637031aab7694"
+      url "https://github.com/franzramadhan/homie/releases/download/v0.6.1/homie-v0.6.1-aarch64-unknown-linux-musl.tar.gz"
+      sha256 "0239471dc69f0352d57740e7b153acbedc46ed536cfb95aa6773a60c5ff07baf"
     end
     on_intel do
-      url "https://github.com/franzramadhan/homie/releases/download/v0.6.0/homie-v0.6.0-x86_64-unknown-linux-musl.tar.gz"
-      sha256 "22a178fbc11caab29bfd3cbbaeb7407d653747bd1a81bc6acc0a60a3128e0aca"
+      url "https://github.com/franzramadhan/homie/releases/download/v0.6.1/homie-v0.6.1-x86_64-unknown-linux-musl.tar.gz"
+      sha256 "91bef2b00a3ad7c393520368d4c918b7db257ea61a98fafd3f97fbfec7d844ce"
     end
   end
 
