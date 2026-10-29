@@ -2,28 +2,28 @@
 class Dvarapala < Formula
   desc "Anti-DDoS gateway with L4 to L7 protection"
   homepage "https://dvarapala.franzramadhan.dev"
-  version "0.12.0"
+  version "0.13.0"
   license "MIT"
 
   on_macos do
     on_arm do
-      url "https://github.com/franzramadhan/dvarapala/releases/download/v0.12.0/dvarapala-v0.12.0-aarch64-apple-darwin.tar.gz"
-      sha256 "998f624b5869c7b0360c9c18b8bb4af0b31d797675424ef9aa097aef2f874d07"
+      url "https://github.com/franzramadhan/dvarapala/releases/download/v0.13.0/dvarapala-v0.13.0-aarch64-apple-darwin.tar.gz"
+      sha256 "e01fc81b8b4870b74333c2308b0b89f6d69300eb4f3029b304d892ff5e29d843"
     end
     on_intel do
-      url "https://github.com/franzramadhan/dvarapala/releases/download/v0.12.0/dvarapala-v0.12.0-x86_64-apple-darwin.tar.gz"
-      sha256 "801e0ebe444947c583caa28c39763310d6bd062a1d3b4b4b815b1f0ff893db54"
+      url "https://github.com/franzramadhan/dvarapala/releases/download/v0.13.0/dvarapala-v0.13.0-x86_64-apple-darwin.tar.gz"
+      sha256 "8e48ebca9f4c6f6872807ffe5f2f859dea1f5195c1c19648667525ebc0d245b5"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/franzramadhan/dvarapala/releases/download/v0.12.0/dvarapala-v0.12.0-aarch64-unknown-linux-musl.tar.gz"
-      sha256 "30cd25bd7610ce1e7fd8c4065ed81544ff1c1ee0754e95b14643d1511a81f6c6"
+      url "https://github.com/franzramadhan/dvarapala/releases/download/v0.13.0/dvarapala-v0.13.0-aarch64-unknown-linux-musl.tar.gz"
+      sha256 "ed6bbd4e2f387372d14b4fe69d9b33b6913dff8ea1f4334c0167e72f01cdb95c"
     end
     on_intel do
-      url "https://github.com/franzramadhan/dvarapala/releases/download/v0.12.0/dvarapala-v0.12.0-x86_64-unknown-linux-musl.tar.gz"
-      sha256 "fac6d21a779e0c1988f0581bc1556e60d0f8581080c2f1478cdca2e6b66ecc48"
+      url "https://github.com/franzramadhan/dvarapala/releases/download/v0.13.0/dvarapala-v0.13.0-x86_64-unknown-linux-musl.tar.gz"
+      sha256 "6e264e6037c2392c7581f134bced2398b86d5dd3ccf520f060012dc556e304ac"
     end
   end
 
